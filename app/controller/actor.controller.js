@@ -30,71 +30,46 @@ exports.delete = (req,res)=>{
     })
 }
 
-exports. findAll = (req,res)=>{
+exports.findAll = (req,res)=>{
     Actor.findAll({
-         include :["movies"]
-        // include :[
-        //     { 
-        //         as : "movies",
-        //         through : {
-        //             attirbutes : ["id","title"]
-        //         }
-        //     }
-        // ]
+        include :[{
+            model : Movies,
+            as : "movies",
+            attirbutes : ["id","title","genre"],
+            through : {
+                attributes : []
+            }
+        }]
     })
     .then(data=>{
         res.send(data);
     })
     .catch(err=>{
-        res.status(500).send({message :"Error..!"})
-    })
+        res.status(500).send({message :"Error occurred..!"})
+    });
 }
 
 exports.findActorById = (req,res)=>{
     const id = req.params.id;
-    Actor.findByPk(id,{include :["movies"]})
+    Actor.findByPk(id,{
+        include :[{
+            model : Movies,
+            as : "movies",
+            attirbutes : ["id","title","genre"],
+            through : {
+                attirbutes :[]
+            }
+        }]
+    })
     .then((data)=>{
-        if(data){
             res.send(data);
-            return;
-        }else{
-            res.send({message : "No actor with this id"})
-        }
-       
-        
     })
     .catch(err=>{
         res.status(500).send({message : "Error Occured..!"});
     })
 }
 
-// Add a Movie to a Actor
 
-// exports.addMovie = (req,res)=>{
-//     const actorId = req.params.actorId;
-//     const id = req.params.id;
-//     Actor.findByPk(actorId)
-//     .then(actor=>{
-//         if(!actor){
-//             res.send({message:"No actor Found"});
-//             return;
-//         }
-//         Movies.findByPk(id).then((movies)=>{
-//             if(!movies){
-//                 res.send({message: "No movie found"})
-//                 return;
-//             }
-//             actor.addMovie(movies);
-//             res.send({message:"Movie added to Actor"});
-//             return actor;
-//         })
-//      res.send(actor);
-
-//     })
-//     .catch(err=>{
-//         res.status(500).send({message :"Error Occurred"});
-//     })
-// }
 
 
 exports.addMovie = (actorId,movieId)=>{

@@ -26,6 +26,8 @@ const sequelize = new Sequelize(
     db.user = require('../models/user.model')(sequelize,Sequelize);
     db.role = require('../models/role.model')(sequelize,Sequelize);
     db.actor = require('../models/actor.model')(sequelize,Sequelize);
+    db.director = require('../models/director.model')(sequelize,Sequelize);
+
 
     // Comment-Movie relation (O-M)
 
@@ -39,14 +41,28 @@ const sequelize = new Sequelize(
 
     db.movies.belongsToMany(db.actor,{
         through : "movies_actor",
-        foreignKey : "movieId",
-        otherKey : "actorId"
+        as : "actor",
+        foreignKey : "movieId"
+        
     });
     db.actor.belongsToMany(db.movies,{
         through : "movies_actor",
-        foreignKey: "actorId",
-        otherKey : "movieId"
+        as : "movies",
+        foreignKey: "actorId"
     });
+
+    // Director-Movie relation (M-M)
+
+    db.director.belongsToMany(db.movies,{
+        through : "movies_director",
+        as : "movies",
+        foreignKey : "director_id"
+    });
+    db.movies.belongsToMany(db.director,{
+        through:"movies_director",
+        as : "director",
+        foreignKey : "movies_id"
+    })
 
     // User-Role relation (M-M)
 

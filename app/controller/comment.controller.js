@@ -1,13 +1,14 @@
+
 const db= require('../models');
 const Comment = db.comment;
+const Movies = db.movies;
 
 exports.create = (req,res)=>{
 
     Comment.create( {
         movieId : req.params.id,
         name : req.body.name,
-        text : req.body.text
-       
+        text : req.body.text  
     })
     .then(comment=>{
         res.send(comment);
@@ -39,7 +40,7 @@ exports.findAll = (req,res)=>{
         res.send(data);
     })
     .catch(err=>{
-        res.status(500).send({message:"Error..!"})
+        res.status(500).send({message:"Error Occurred"})
     })
 }
 
@@ -50,7 +51,7 @@ exports.delete = (req,res)=>{
     Comment.destroy({
         where:{id:id}
     })
-    .then(num=>{
+    .then(()=>{
         res.send({message : "deleted Successfully"})
     })
     .catch(err=>{
@@ -65,9 +66,9 @@ exports.update = (req,res)=>{
     const id =  req.params.id;
     Comment.update(req.body,{where : {id:id}})
     .then(data=>{
-        res.send({message : "Update aakeend mone"})
+        res.send({message : "Comment Updated"})
     })
     .catch(err=>{
-        res.status(500).send({message : "Maatan Patanilla"})
+        res.status(500).send({message : "Cannot be updated"})
     })
 }

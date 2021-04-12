@@ -3,6 +3,7 @@ const Movies = db.movies;
 const Op =db.Sequelize.Op;
 const Actor = db.actor;
 const Comment = db.comment;
+const Director = db.director;
 
 // Create and Save a new Movies
 
@@ -20,7 +21,6 @@ exports.create = (req,res)=>{
         genre : req.body.genre,
         rated : req.body.rated,
         awards : req.body.awards
-        
     };
   
     Movies.create(movies)
@@ -39,23 +39,25 @@ exports.findAll =(req,res)=>{
     var condition = title ? {title : {[Op.iLike]: `%${title}%`}} : null;
 
     Movies.findAll({
-        where:condition,include:["comment","actors"]
-        // include : [
-        //     {
-        //         model : Actor,
-        //         as : "actors",
-        //         through : {
-        //             attributes: ["id","title","genre"]
-        //         }
-        //     },
-        //     {
-        //         model : Comment,
-        //         as : "comment",
-        //         through : {
-        //             attributes : ["id","name","text"]
-        //         }
-        //     }
-        // ]
+        where:condition,
+        include : [
+            {
+                model : Actor,
+                as : "actor",
+                attributes: ["id","name"],
+                through : {
+                    attributes: []
+                }
+            },
+            {
+                model : Director,
+                as : "director",
+                attributes : ["id","name"],
+                through : {
+                    attributes : []
+                }
+            }
+        ]
     
     })
     .then(data=>{
@@ -70,7 +72,24 @@ exports.findAll =(req,res)=>{
 
 exports.findOne =(req,res)=>{
     const id = req.params.id;
-    Movies.findByPk(id,{include:["comment","actors"]})
+    Movies.findByPk(id,{ include : [
+        {
+            model : Actor,
+            as : "actor",
+            attributes: ["id","name"],
+            through : {
+                attributes: []
+            }
+        },
+        {
+            model : Director,
+            as : "director",
+            attributes : ["id","name"],
+            through : {
+                attributes : []
+            }
+        },"comment"
+    ]})
     .then(data=>{
         res.send(data);
     })
@@ -126,7 +145,7 @@ exports.deleteAll = (req,res)=>{
         truncate : false
     })
     .then(nums=>{
-        res.send({message:`${nums} Moviess were deleted Successfully`});
+        res.send({message:`${nums} Movies were deleted Successfully`});
     })
     .catch(err=>{
         res.status(500).send({message:err.message||"Eroor occurred while deleting all movies"});
